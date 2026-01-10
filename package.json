@@ -2,7 +2,7 @@
   "name": "ai-rules-manager",
   "displayName": "AI Rules Manager",
   "description": "Centralized rule management for multiple AI tools (Cursor, Copilot, Claude, Windsurf, etc.)",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "ikaladev",
   "engines": {
     "vscode": "^1.85.0"
