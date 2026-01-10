@@ -123,12 +123,33 @@ export class RuleScanner {
     }
 
     /**
-     * Busca un archivo de reglas específico
+     * Busca un archivo de reglas específico (case-insensitive)
      */
     private async findRuleFile(filePath: string): Promise<vscode.Uri | undefined> {
+        // Extraer el nombre del archivo y el directorio
+        const fileName = path.basename(filePath);
+        const dirPath = path.dirname(filePath);
+
+        // Crear patrón con comodín para case-insensitive
+        // Convierte "agents.md" en "[Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]"
+        const caseInsensitiveFileName = fileName
+            .split('')
+            .map(char => {
+                if (/[a-zA-Z]/.test(char)) {
+                    return `[${char.toLowerCase()}${char.toUpperCase()}]`;
+                }
+                return char;
+            })
+            .join('');
+
+        // Construir el patrón completo
+        const fullPattern = dirPath === '.'
+            ? caseInsensitiveFileName
+            : `${dirPath}/${caseInsensitiveFileName}`;
+
         const pattern = new vscode.RelativePattern(
             vscode.workspace.workspaceFolders![0],
-            filePath
+            fullPattern
         );
 
         const files = await vscode.workspace.findFiles(

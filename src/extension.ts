@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Verificar que hay un workspace abierto
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         vscode.window.showWarningMessage(
-            'AI Rules Manager requiere un workspace abierto para funcionar'
+            'AI Rules Manager requires an open workspace to function'
         );
         return;
     }
@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (!metadataService) {
             vscode.window.showErrorMessage(
-                'No se pudo inicializar AI Rules Manager: No hay workspace'
+                'Could not initialize AI Rules Manager: No workspace'
             );
             return;
         }
@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         vscode.window.showErrorMessage(
-            `Error al inicializar AI Rules Manager: ${errorMsg}`
+            `Error initializing AI Rules Manager: ${errorMsg}`
         );
     }
 }
@@ -82,22 +82,22 @@ export function deactivate() {
  */
 async function showWelcomeMessage(context: vscode.ExtensionContext): Promise<void> {
     const action = await vscode.window.showInformationMessage(
-        '🤖 ¡Bienvenido a AI Rules Manager! Gestiona tus reglas de IA desde un único archivo.',
-        'Comenzar',
-        'Más tarde'
+        '🤖 Welcome to AI Rules Manager! Manage your AI rules from a single file.',
+        'Get Started',
+        'Later'
     );
 
-    if (action === 'Comenzar') {
+    if (action === 'Get Started') {
         const hasAiRules = await vscode.workspace.findFiles('**/Ai_Rules.md', '**/node_modules/**');
 
         if (hasAiRules.length === 0) {
             const createAction = await vscode.window.showInformationMessage(
-                '¿Deseas crear el archivo Ai_Rules.md para comenzar?',
-                'Sí, crear',
-                'No, gracias'
+                'Do you want to create the Ai_Rules.md file to get started?',
+                'Yes, Create',
+                'No, Thanks'
             );
 
-            if (createAction === 'Sí, crear') {
+            if (createAction === 'Yes, Create') {
                 await vscode.commands.executeCommand('aiRules.createSource');
             }
         } else {

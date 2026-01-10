@@ -187,22 +187,22 @@ Luego presiona `F5` para abrir en Extension Development Host.
 ### Panel de Control
 *Hermosa UI con glassmorphism con todas las acciones en un solo lugar*
 
-![Panel de Control](https://via.placeholder.com/800x500?text=Panel+de+Control)
+![Panel de Control](docs/Images/IA_Rules_Front.png)
 
 ### Editor Integrado
 *Edita Ai_Rules.md sin salir del panel*
 
-![Editor Integrado](https://via.placeholder.com/800x500?text=Editor+Integrado)
+![Editor Integrado](docs/Images/IA_Rules_Front_1.png)
 
 ### Selector de Plantillas
 *Inserta reglas predefinidas con un clic*
 
-![Selector de Plantillas](https://via.placeholder.com/800x500?text=Selector+de+Plantillas)
+![Diálogo de Sincronización](docs/Images/IA_Rules_Sync.png)
 
 ### TreeView en Sidebar
 *Ve el estado de sincronización de un vistazo*
 
-![TreeView](https://via.placeholder.com/600x400?text=TreeView)
+![Diálogo de Eliminación](docs/Images/IA_Rules_Delete.png)
 
 ---
 

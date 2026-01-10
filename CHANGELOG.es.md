@@ -7,6 +7,25 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 > **English**: [CHANGELOG.md](CHANGELOG.md)
 
+## [1.0.1] - 2026-01-10
+
+### 🐛 Corregido
+- **Detección de archivos case-insensitive**: El scanner ahora detecta archivos de reglas sin importar mayúsculas/minúsculas (ej. `agents.md`, `AGENTS.md`, `Agents.md`)
+- **Idioma de plantilla por defecto**: La plantilla de `Ai_Rules.md` ahora está en inglés por defecto
+
+### ✨ Agregado
+- **Diálogo de auto-sincronización**: Después de crear `Ai_Rules.md`, se pregunta al usuario si desea sincronizar con todas las IAs
+- **Localización completa en inglés**: Todos los mensajes, diálogos y descripciones visibles están ahora en inglés por defecto
+- **Screenshots reales**: La documentación ahora incluye capturas reales de la extensión en lugar de placeholders
+
+### 🔧 Cambiado
+- Todos los mensajes de UI traducidos al inglés (operaciones de escaneo, sincronización, consolidación, eliminación)
+- Descripciones de herramientas de IA en QuickPick ahora en inglés
+- Mensajes de bienvenida y notificaciones de error en inglés
+- Se mantiene soporte bilingüe a través del selector de idioma en el Panel de Control
+
+---
+
 ## [1.0.0] - 2026-01-09
 
 ### ✨ Agregado

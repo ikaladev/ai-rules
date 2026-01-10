@@ -187,22 +187,22 @@ Then press `F5` to open in Extension Development Host.
 ### Control Panel
 *Beautiful glassmorphism UI with all actions in one place*
 
-![Control Panel](https://via.placeholder.com/800x500?text=Control+Panel+Screenshot)
+![Control Panel](docs/Images/IA_Rules_Front.png)
 
 ### Inline Editor
 *Edit Ai_Rules.md without leaving the panel*
 
-![Inline Editor](https://via.placeholder.com/800x500?text=Inline+Editor+Screenshot)
+![Inline Editor](docs/Images/IA_Rules_Front_1.png)
 
 ### Template Selector
 *Insert pre-made rules with one click*
 
-![Template Selector](https://via.placeholder.com/800x500?text=Template+Selector+Screenshot)
+![Sync Dialog](docs/Images/IA_Rules_Sync.png)
 
 ### TreeView Sidebar
 *See sync status at a glance*
 
-![TreeView](https://via.placeholder.com/600x400?text=TreeView+Screenshot)
+![Delete Dialog](docs/Images/IA_Rules_Delete.png)
 
 ---
 

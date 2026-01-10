@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 > **Español**: [CHANGELOG.es.md](CHANGELOG.es.md)
 
+## [1.0.1] - 2026-01-10
+
+### 🐛 Fixed
+- **Case-insensitive file detection**: Scanner now detects rule files regardless of case (e.g., `agents.md`, `AGENTS.md`, `Agents.md`)
+- **Default template language**: `Ai_Rules.md` template is now in English by default
+
+### ✨ Added
+- **Auto-sync dialog**: After creating `Ai_Rules.md`, users are prompted to sync with all AI tools
+- **Complete English localization**: All user-facing messages, dialogs, and descriptions are now in English by default
+- **Real screenshots**: Documentation now includes actual extension screenshots instead of placeholders
+
+### 🔧 Changed
+- All UI messages translated to English (scan, sync, consolidate, delete operations)
+- AI tool descriptions in QuickPick now in English
+- Welcome messages and error notifications in English
+- Maintained bilingual support through Control Panel language selector
+
+---
+
 ## [1.0.0] - 2026-01-09
 
 ### ✨ Added

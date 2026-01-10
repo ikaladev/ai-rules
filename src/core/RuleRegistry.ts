@@ -16,56 +16,56 @@ export const AI_DEFINITIONS: AIRuleDefinition[] = [
         name: 'Cursor',
         filePath: '.cursorrules',
         icon: '🎯',
-        description: 'Reglas para Cursor Editor (chat y Composer)'
+        description: 'Rules for Cursor Editor (chat and Composer)'
     },
     {
         id: 'copilot',
         name: 'GitHub Copilot',
         filePath: '.github/copilot-instructions.md',
         icon: '🐙',
-        description: 'Instrucciones específicas del proyecto para GitHub Copilot'
+        description: 'Project-specific instructions for GitHub Copilot'
     },
     {
         id: 'windsurf',
         name: 'Windsurf',
         filePath: '.windsurfrules',
         icon: '🏄',
-        description: 'Cascade rules para Windsurf (Codeium)'
+        description: 'Cascade rules for Windsurf (Codeium)'
     },
     {
         id: 'cline',
         name: 'Cline',
         filePath: '.clinerules',
         icon: '🤖',
-        description: 'Reglas para el agente autónomo Cline'
+        description: 'Rules for Cline autonomous agent'
     },
     {
         id: 'aider',
         name: 'Aider',
         filePath: '.aider.conf.yml',
         icon: '⚙️',
-        description: 'Configuración para Aider CLI coding assistant'
+        description: 'Configuration for Aider CLI coding assistant'
     },
     {
         id: 'aider-conventions',
         name: 'Aider Conventions',
         filePath: 'CONVENTIONS.md',
         icon: '📋',
-        description: 'Convenciones de código para Aider'
+        description: 'Code conventions for Aider'
     },
     {
         id: 'claude',
         name: 'Claude',
         filePath: 'CLAUDE.md',
         icon: '🧠',
-        description: 'Instrucciones para Claude AI'
+        description: 'Instructions for Claude AI'
     },
     {
         id: 'agents',
-        name: 'Agentes Genéricos',
+        name: 'Generic Agents',
         filePath: 'agents.md',
         icon: '🔮',
-        description: 'Reglas genéricas para múltiples agentes de IA'
+        description: 'Generic rules for multiple AI agents'
     }
 ];
 

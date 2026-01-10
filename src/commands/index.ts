@@ -111,7 +111,7 @@ async function handleScanProject(
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: 'Escaneando proyecto...',
+                title: 'Scanning project...',
                 cancellable: false
             },
             async () => {
@@ -120,18 +120,18 @@ async function handleScanProject(
 
                 const summary = await scanner.getScanSummary();
 
-                let message = `Escaneo completado:\n`;
-                message += `📄 Fuente: ${summary.hasSource ? 'Encontrada' : '❌ No encontrada'}\n`;
-                message += `✅ Sincronizadas: ${summary.syncedRules}\n`;
-                message += `⚠️ Desactualizadas: ${summary.outdatedRules}\n`;
-                message += `❌ Ausentes: ${summary.absentRules}`;
+                let message = `Scan completed:\n`;
+                message += `📄 Source: ${summary.hasSource ? 'Found' : '❌ Not found'}\n`;
+                message += `✅ Synced: ${summary.syncedRules}\n`;
+                message += `⚠️ Outdated: ${summary.outdatedRules}\n`;
+                message += `❌ Missing: ${summary.absentRules}`;
 
                 vscode.window.showInformationMessage(message);
             }
         );
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage(`Error al escanear proyecto: ${errorMsg}`);
+        vscode.window.showErrorMessage(`Error scanning project: ${errorMsg}`);
     }
 }
 
@@ -149,12 +149,12 @@ async function handleSyncAll(
 
         if (!scanResult.sourceFile) {
             const action = await vscode.window.showWarningMessage(
-                'No se encontró Ai_Rules.md. ¿Deseas crearlo?',
-                'Crear',
-                'Cancelar'
+                'Ai_Rules.md not found. Do you want to create it?',
+                'Create',
+                'Cancel'
             );
 
-            if (action === 'Crear') {
+            if (action === 'Create') {
                 await handleCreateSource(syncService, scanner, treeProvider);
             }
             return;
@@ -164,7 +164,7 @@ async function handleSyncAll(
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: 'Sincronizando reglas...',
+                title: 'Synchronizing rules...',
                 cancellable: false
             },
             async (progress) => {
@@ -175,12 +175,12 @@ async function handleSyncAll(
 
                 if (result.success) {
                     vscode.window.showInformationMessage(
-                        `✅ Sincronización completada: ${result.syncedFiles.length} archivos actualizados`
+                        `✅ Synchronization completed: ${result.syncedFiles.length} file(s) updated`
                     );
                 } else {
                     vscode.window.showWarningMessage(
-                        `⚠️ Sincronización con errores:\n` +
-                        `✅ Exitosos: ${result.syncedFiles.length}\n` +
+                        `⚠️ Synchronization with errors:\n` +
+                        `✅ Successful: ${result.syncedFiles.length}\n` +
                         `❌ Fallidos: ${result.failedFiles.length}`
                     );
                 }
@@ -191,7 +191,7 @@ async function handleSyncAll(
         );
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage(`Error al sincronizar: ${errorMsg}`);
+        vscode.window.showErrorMessage(`Error synchronizing: ${errorMsg}`);
     }
 }
 
@@ -225,7 +225,7 @@ async function handleSyncSpecific(
         }));
 
         const selected = await vscode.window.showQuickPick(items, {
-            placeHolder: 'Selecciona la IA para generar sus reglas',
+            placeHolder: 'Select the AI to generate its rules',
             matchOnDescription: true,
             matchOnDetail: true
         });
@@ -272,31 +272,39 @@ async function handleCreateSource(
     try {
         const uri = await syncService.createSourceFile();
 
-        vscode.window.showInformationMessage(
-            '✅ Archivo Ai_Rules.md creado exitosamente'
-        );
-
         // Abrir el archivo
         const document = await vscode.workspace.openTextDocument(uri);
         await vscode.window.showTextDocument(document);
 
-        // Actualizar vista
-        await handleScanProject(scanner, treeProvider);
+        // Preguntar si desea sincronizar
+        const action = await vscode.window.showInformationMessage(
+            '✅ Ai_Rules.md created successfully!\n\nDo you want to sync these rules with all AI tools now?',
+            'Yes, Sync Now',
+            'No, Later'
+        );
+
+        if (action === 'Yes, Sync Now') {
+            // Ejecutar sincronización
+            await handleSyncAll(scanner, syncService, treeProvider);
+        } else {
+            // Solo actualizar vista
+            await handleScanProject(scanner, treeProvider);
+        }
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
 
         if (errorMsg.includes('ya existe')) {
             const action = await vscode.window.showWarningMessage(
-                'El archivo Ai_Rules.md ya existe. ¿Deseas abrirlo?',
-                'Abrir',
-                'Cancelar'
+                'Ai_Rules.md already exists. Do you want to open it?',
+                'Open',
+                'Cancel'
             );
 
-            if (action === 'Abrir') {
+            if (action === 'Open') {
                 await handleViewRules(scanner, syncService);
             }
         } else {
-            vscode.window.showErrorMessage(`Error al crear Ai_Rules.md: ${errorMsg}`);
+            vscode.window.showErrorMessage(`Error creating Ai_Rules.md: ${errorMsg}`);
         }
     }
 }
@@ -362,8 +370,8 @@ async function handleConsolidateRules(
 
         if (scanResult.ruleFiles.length === 0) {
             vscode.window.showWarningMessage(
-                'No se encontraron archivos de reglas para consolidar. ' +
-                'Crea reglas manualmente primero (.cursorrules, CLAUDE.md, etc.)'
+                'No rule files found to consolidate. ' +
+                'Create rules manually first (.cursorrules, CLAUDE.md, etc.)'
             );
             return;
         }
@@ -374,13 +382,13 @@ async function handleConsolidateRules(
             .join('\n');
 
         const confirm = await vscode.window.showInformationMessage(
-            `Se consolidarán ${scanResult.ruleFiles.length} archivo(s) de reglas:\n\n${fileList}\n\n¿Continuar?`,
+            `${scanResult.ruleFiles.length} rule file(s) will be consolidated:\n\n${fileList}\n\nContinue?`,
             { modal: true },
-            'Sí, consolidar',
-            'Cancelar'
+            'Yes, Consolidate',
+            'Cancel'
         );
 
-        if (confirm !== 'Sí, consolidar') {
+        if (confirm !== 'Yes, Consolidate') {
             return;
         }
 
@@ -388,15 +396,15 @@ async function handleConsolidateRules(
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: 'Consolidando reglas dispersas...',
+                title: 'Consolidating scattered rules...',
                 cancellable: false
             },
             async () => {
                 const uri = await syncService.consolidateRules();
 
                 vscode.window.showInformationMessage(
-                    `✅ Reglas consolidadas exitosamente en Ai_Rules.md\n` +
-                    `Se fusionaron ${scanResult.ruleFiles.length} archivos`
+                    `✅ Rules consolidated successfully in Ai_Rules.md\n` +
+                    `Merged ${scanResult.ruleFiles.length} file(s)`
                 );
 
                 // Abrir el archivo consolidado
@@ -415,7 +423,7 @@ async function handleConsolidateRules(
             return;
         }
 
-        vscode.window.showErrorMessage(`Error al consolidar reglas: ${errorMsg}`);
+        vscode.window.showErrorMessage(`Error consolidating rules: ${errorMsg}`);
     }
 }
 
@@ -462,7 +470,7 @@ async function handleForceSyncAll(
         await vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: 'Forzando sincronización...',
+                title: 'Forcing synchronization...',
                 cancellable: false
             },
             async () => {
@@ -473,13 +481,13 @@ async function handleForceSyncAll(
 
                 if (result.success) {
                     vscode.window.showInformationMessage(
-                        `⚡ Sincronización forzada completada: ${result.syncedFiles.length} archivos actualizados`
+                        `⚡ Forced synchronization completed: ${result.syncedFiles.length} file(s) updated`
                     );
                 } else {
                     vscode.window.showWarningMessage(
-                        `⚠️ Sincronización con errores:\n` +
-                        `✅ Exitosos: ${result.syncedFiles.length}\n` +
-                        `❌ Fallidos: ${result.failedFiles.length}`
+                        `⚠️ Synchronization with errors:\n` +
+                        `✅ Successful: ${result.syncedFiles.length}\n` +
+                        `❌ Failed: ${result.failedFiles.length}`
                     );
                 }
 
@@ -489,7 +497,7 @@ async function handleForceSyncAll(
         );
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage(`Error al forzar sincronización: ${errorMsg}`);
+        vscode.window.showErrorMessage(`Error forcing synchronization: ${errorMsg}`);
     }
 }
 
@@ -506,7 +514,7 @@ async function handleDeleteAllRules(
 
         if (scanResult.ruleFiles.length === 0) {
             vscode.window.showInformationMessage(
-                'No se encontraron archivos de reglas para eliminar.'
+                'No rule files found to delete.'
             );
             return;
         }
@@ -517,17 +525,17 @@ async function handleDeleteAllRules(
             .join('\n');
 
         const confirm = await vscode.window.showWarningMessage(
-            `🗑️ Eliminar Archivos de Reglas\n\n` +
-            `Se eliminarán ${scanResult.ruleFiles.length} archivo(s):\n\n${fileList}\n\n` +
-            `⚠️ Esta acción NO se puede deshacer.\n\n` +
-            `Nota: Ai_Rules.md NO será eliminado.\n\n` +
-            `¿Continuar?`,
+            `🗑️ Delete Rule Files\n\n` +
+            `${scanResult.ruleFiles.length} file(s) will be deleted:\n\n${fileList}\n\n` +
+            `⚠️ This action CANNOT be undone.\n\n` +
+            `Note: Ai_Rules.md will NOT be deleted.\n\n` +
+            `Continue?`,
             { modal: true },
-            'Sí, eliminar',
-            'Cancelar'
+            'Yes, Delete',
+            'Cancel'
         );
 
-        if (confirm !== 'Sí, eliminar') {
+        if (confirm !== 'Yes, Delete') {
             return;
         }
 
