@@ -362,58 +362,58 @@ Se consolidaron **${filesCount} archivos** de reglas en este documento.
      * Obtiene la plantilla para el archivo fuente
      */
     private getSourceTemplate(): string {
-        return `# 🤖 Reglas de IA - Fuente de Verdad
+        return `# 🤖 AI Rules - Source of Truth
 
-Este archivo es la **fuente única de verdad** para todas las reglas de IA en este proyecto.
+This file is the **single source of truth** for all AI rules in this project.
 
-Los cambios aquí se sincronizan automáticamente a:
+Changes here are automatically synchronized to:
 - Cursor (.cursorrules)
 - GitHub Copilot (.github/copilot-instructions.md)
 - Windsurf (.windsurfrules)
 - Cline (.clinerules)
 - Aider (.aider.conf.yml)
 - Claude (CLAUDE.md)
-- Agentes genéricos (agents.md)
+- Generic agents (agents.md)
 
-## 📋 Reglas Generales
+## 📋 General Rules
 
-### Estilo de Código
-- Usar TypeScript para todo el código nuevo
-- Seguir convenciones de nomenclatura camelCase
-- Documentar funciones públicas con JSDoc
-- Mantener funciones pequeñas y enfocadas
+### Code Style
+- Use TypeScript for all new code
+- Follow camelCase naming conventions
+- Document public functions with JSDoc
+- Keep functions small and focused
 
-### Arquitectura
-- Separación de responsabilidades
-- Componentes reutilizables
-- Inyección de dependencias donde sea apropiado
+### Architecture
+- Separation of concerns
+- Reusable components
+- Dependency injection where appropriate
 
 ### Testing
-- Escribir tests unitarios para lógica de negocio
-- Mantener cobertura > 80%
+- Write unit tests for business logic
+- Maintain coverage > 80%
 
-### Documentación
-- README actualizado
-- Comentarios en español
-- Documentar decisiones importantes
+### Documentation
+- Keep README updated
+- Comments in English
+- Document important decisions
 
 ## 🎯 Tech Stack
 
 - **Runtime**: Node.js
-- **Lenguaje**: TypeScript
+- **Language**: TypeScript
 - **IDE**: Visual Studio Code
-- **Control de versiones**: Git
+- **Version control**: Git
 
-## 💡 Preferencias de IA
+## 💡 AI Preferences
 
-- Explicar el razonamiento detrás de las sugerencias
-- Priorizar código limpio y mantenible sobre optimización prematura
-- Sugerir mejores prácticas y patrones de diseño cuando sea relevante
-- Detectar y advertir sobre posibles bugs o problemas de seguridad
+- Explain the reasoning behind suggestions
+- Prioritize clean and maintainable code over premature optimization
+- Suggest best practices and design patterns when relevant
+- Detect and warn about potential bugs or security issues
 
 ---
 
-✨ **Tip**: Sincroniza estos cambios ejecutando "AI Rules: Sincronizar todas las reglas" desde la paleta de comandos.
+✨ **Tip**: Sync these changes by running "AI Rules: Sync All Rules" from the command palette.
 `;
     }
 }
