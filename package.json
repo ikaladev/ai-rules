@@ -1,0 +1,143 @@
+{
+  "name": "ai-rules-manager",
+  "displayName": "AI Rules Manager",
+  "description": "Centralized rule management for multiple AI tools (Cursor, Copilot, Claude, Windsurf, etc.)",
+  "version": "1.0.0",
+  "publisher": "ikaladev",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "rules",
+    "cursor",
+    "copilot",
+    "claude",
+    "windsurf",
+    "cline",
+    "aider",
+    "sync",
+    "management"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiRules.scanProject",
+        "title": "AI Rules: Scan Project",
+        "icon": "$(search)"
+      },
+      {
+        "command": "aiRules.syncAll",
+        "title": "AI Rules: Sync All Rules",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "aiRules.syncSpecific",
+        "title": "AI Rules: Generate Rules for Specific AI",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "aiRules.createSource",
+        "title": "AI Rules: Create Ai_Rules.md",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "aiRules.viewRules",
+        "title": "AI Rules: View Rules",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "aiRules.refresh",
+        "title": "AI Rules: Refresh View",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "aiRules.openFile",
+        "title": "Open Rules File"
+      },
+      {
+        "command": "aiRules.showConfigPanel",
+        "title": "AI Rules: Open Control Panel",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "aiRules.consolidateRules",
+        "title": "AI Rules: Consolidate Scattered Rules",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "aiRules.forceSyncAll",
+        "title": "AI Rules: Force Synchronization",
+        "icon": "$(zap)"
+      },
+      {
+        "command": "aiRules.deleteAllRules",
+        "title": "AI Rules: Delete All Rule Files",
+        "icon": "$(trash)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "aiRulesManager",
+          "name": "AI Rules Manager",
+          "icon": "$(robot)",
+          "contextualTitle": "AI Rules Manager"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "aiRulesManager",
+        "contents": "No AI rule files found in this project.\\n[Scan Project](command:aiRules.scanProject)\\n[Create Ai_Rules.md](command:aiRules.createSource)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "aiRules.refresh",
+          "when": "view == aiRulesManager",
+          "group": "navigation"
+        },
+        {
+          "command": "aiRules.syncAll",
+          "when": "view == aiRulesManager",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "aiRules.openFile",
+          "when": "view == aiRulesManager"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.x",
+    "@typescript-eslint/parser": "^6.x",
+    "eslint": "^8.x",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ikaladev/ai-rules-manager"
+  },
+  "license": "MIT"
+}
