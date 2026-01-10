@@ -4,7 +4,7 @@
 
 [![Visual Studio Marketplace](https://img.shields.io/badge/VS%20Code-Extension-blue)](https://marketplace.visualstudio.com/vscode)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/ikaladev/ai-rules-manager)
+[![Version](https://img.shields.io/badge/version-1.0.1-green.svg)](https://github.com/ikaladev/ai-rules)
 
 > **Español**: [README.es.md](README.es.md)
 
@@ -94,7 +94,7 @@ This creates:
 
 ### From Source (Development)
 ```bash
-git clone https://github.com/ikaladev/ai-rules-manager.git
+git clone https://github.com/ikaladev/ai-rules.git
 cd ai-rules-manager
 npm install
 npm run compile
@@ -316,7 +316,7 @@ All commands accessible via:
 ### Setup
 ```bash
 # Clone repository
-git clone https://github.com/ikaladev/ai-rules-manager.git
+git clone https://github.com/ikaladev/ai-rules.git
 cd ai-rules-manager
 
 # Install dependencies
@@ -517,7 +517,7 @@ Special thanks to users who provided feedback and feature requests.
 
 Made with ❤️ by the developer community
 
-[![GitHub stars](https://img.shields.io/github/stars/ikaladev/ai-rules-manager?style=social)](https://github.com/ikaladev/ai-rules-manager)
+[![GitHub stars](https://img.shields.io/github/stars/ikaladev/ai-rules?style=social)](https://github.com/ikaladev/ai-rules)
 [![Twitter Follow](https://img.shields.io/twitter/follow/ikaladev?style=social)](https://twitter.com/ikaladev)
 
 </div>

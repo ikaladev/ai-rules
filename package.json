@@ -2,9 +2,8 @@
   "name": "ai-rules-manager",
   "displayName": "AI Rules Manager",
   "description": "Centralized rule management for multiple AI tools (Cursor, Copilot, Claude, Windsurf, etc.)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "ikaladev",
-  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -137,7 +136,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ikaladev/ai-rules-manager"
+    "url": "https://github.com/ikaladev/ai-rules"
   },
   "license": "MIT"
 }
