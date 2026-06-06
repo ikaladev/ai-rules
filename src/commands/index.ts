@@ -167,7 +167,7 @@ async function handleSyncAll(
                 title: 'Synchronizing rules...',
                 cancellable: false
             },
-            async (progress) => {
+            async () => {
                 const result = await syncService.syncAll(scanResult.sourceFile!, {
                     askConfirmation: true,
                     addHeader: true

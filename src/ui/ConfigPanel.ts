@@ -159,7 +159,7 @@ async function loadEditorContent(panel: vscode.WebviewPanel): Promise<void> {
         content: content,
         exists: true
       });
-    } catch (error) {
+    } catch {
       // Archivo no existe
       panel.webview.postMessage({
         command: 'setContent',

@@ -1,93 +1,46 @@
 /**
- * RuleSyncService - Sincronización de reglas entre archivo fuente y destinos
- * 
- * Este módulo maneja la sincronización del contenido de Ai_Rules.md
- * hacia los diferentes archivos de configuración de IAs.
+ * RuleSyncService - Adaptador VS Code sobre la sincronización del motor portable.
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs/promises';
 import * as path from 'path';
+import { createEngine, ruleRegistry } from '../../packages/engine/src';
 import { SyncOptions, SyncResult } from '../types';
-import { ruleRegistry } from './RuleRegistry';
 import { MetadataService } from '../utils/metadata';
 import { RuleScanner } from './RuleScanner';
 
-/**
- * Servicio de sincronización de reglas
- */
 export class RuleSyncService {
-    private metadataService: MetadataService;
-    private scanner: RuleScanner;
-    private workspaceRoot: string;
+    private engine = createEngine({ workspaceRoot: this.workspaceRoot });
 
-    constructor(metadataService: MetadataService, scanner: RuleScanner) {
-        this.metadataService = metadataService;
-        this.scanner = scanner;
-
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-        if (!workspaceFolder) {
-            throw new Error('No hay workspace abierto');
-        }
-        this.workspaceRoot = workspaceFolder.uri.fsPath;
+    constructor(
+        private metadataService: MetadataService,
+        private scanner: RuleScanner,
+        private workspaceRoot: string = vscode.workspace.workspaceFolders![0].uri.fsPath
+    ) {
+        void this.metadataService;
+        void this.scanner;
     }
 
-    /**
-     * Sincroniza todas las reglas desde el archivo fuente
-     */
     async syncAll(sourceUri: vscode.Uri, options?: SyncOptions): Promise<SyncResult> {
-        const result: SyncResult = {
-            success: true,
-            syncedFiles: [],
-            failedFiles: []
-        };
+        void sourceUri;
 
-        try {
-            // Leer contenido del archivo fuente
-            const sourceContent = await fs.readFile(sourceUri.fsPath, 'utf-8');
-            const sourceHash = await this.scanner.calculateFileHash(sourceUri);
+        if (options?.askConfirmation !== false) {
+            const confirmedTargets = await this.confirmExistingTargets(options?.aiTypes);
 
-            // Obtener todas las definiciones de IAs
-            const allDefinitions = ruleRegistry.getAllDefinitions();
-
-            // Filtrar según opciones
-            const definitionsToSync = options?.aiTypes
-                ? allDefinitions.filter(def => options.aiTypes!.includes(def.id))
-                : allDefinitions;
-
-            // Sincronizar cada IA
-            for (const definition of definitionsToSync) {
-                try {
-                    await this.syncSingle(
-                        definition.id,
-                        definition.filePath,
-                        sourceContent,
-                        sourceHash,
-                        options
-                    );
-                    result.syncedFiles.push(definition.filePath);
-                } catch (error) {
-                    const errorMsg = error instanceof Error ? error.message : String(error);
-                    result.failedFiles.push(`${definition.filePath}: ${errorMsg}`);
-                    result.success = false;
-                }
-            }
-
-            return result;
-        } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : String(error);
-            return {
-                success: false,
-                syncedFiles: [],
-                failedFiles: [],
-                error: errorMsg
-            };
+            return this.engine.syncAll({
+                addHeader: options?.addHeader,
+                aiTypes: confirmedTargets,
+                overwrite: true
+            });
         }
+
+        return this.engine.syncAll({
+            addHeader: options?.addHeader,
+            aiTypes: options?.aiTypes,
+            overwrite: true
+        });
     }
 
-    /**
-     * Sincroniza un archivo específico de IA
-     */
     async syncSingle(
         aiType: string,
         targetPath: string,
@@ -95,100 +48,49 @@ export class RuleSyncService {
         sourceHash: string,
         options?: SyncOptions
     ): Promise<void> {
-        const fullPath = path.join(this.workspaceRoot, targetPath);
+        void targetPath;
+        void content;
+        void sourceHash;
 
-        // Verificar si el archivo existe
-        const fileExists = await this.fileExists(fullPath);
-
-        // Solicitar confirmación si es necesario
-        if (fileExists && options?.askConfirmation !== false) {
-            const confirmed = await this.confirmOverwrite(targetPath);
-            if (!confirmed) {
-                throw new Error('Sincronización cancelada por el usuario');
-            }
-        }
-
-        // Generar contenido con encabezado
-        const finalContent = options?.addHeader !== false
-            ? this.addHeader(content)
-            : content;
-
-        // Asegurar que existe el directorio
-        await this.ensureDirectory(fullPath);
-
-        // Escribir el archivo
-        await fs.writeFile(fullPath, finalContent, 'utf-8');
-
-        // Actualizar metadata
-        await this.metadataService.updateTargetMetadata(
-            aiType,
-            targetPath,
-            sourceHash
-        );
+        await this.syncByAIType(aiType, vscode.Uri.file(path.join(this.workspaceRoot, 'Ai_Rules.md')), options);
     }
 
-    /**
-     * Sincroniza un tipo de IA específico
-     */
     async syncByAIType(
         aiType: string,
         sourceUri: vscode.Uri,
         options?: SyncOptions
     ): Promise<void> {
+        void sourceUri;
+
         const definition = ruleRegistry.getDefinition(aiType);
 
         if (!definition) {
             throw new Error(`Tipo de IA no soportado: ${aiType}`);
         }
 
-        const sourceContent = await fs.readFile(sourceUri.fsPath, 'utf-8');
-        const sourceHash = await this.scanner.calculateFileHash(sourceUri);
+        if (options?.askConfirmation !== false) {
+            const shouldContinue = await this.confirmOverwrite(definition.filePath);
 
-        await this.syncSingle(
-            definition.id,
-            definition.filePath,
-            sourceContent,
-            sourceHash,
-            options
-        );
-    }
-
-    /**
-     * Crea el archivo fuente Ai_Rules.md con una plantilla
-     */
-    async createSourceFile(): Promise<vscode.Uri> {
-        const sourceFileName = 'Ai_Rules.md';
-        const sourcePath = path.join(this.workspaceRoot, sourceFileName);
-
-        // Verificar si ya existe
-        if (await this.fileExists(sourcePath)) {
-            throw new Error('El archivo Ai_Rules.md ya existe');
+            if (!shouldContinue) {
+                throw new Error('Sincronización cancelada por el usuario');
+            }
         }
 
-        // Crear contenido de plantilla
-        const template = this.getSourceTemplate();
+        await this.engine.syncTarget(aiType, {
+            addHeader: options?.addHeader,
+            overwrite: true
+        });
+    }
 
-        // Escribir el archivo
-        await fs.writeFile(sourcePath, template, 'utf-8');
-
-        // Actualizar metadata
-        const metadata = await this.metadataService.readMetadata();
-        metadata.sourcePath = sourceFileName;
-        await this.metadataService.writeMetadata(metadata);
-
+    async createSourceFile(): Promise<vscode.Uri> {
+        const sourcePath = await this.engine.createSourceFile();
         return vscode.Uri.file(sourcePath);
     }
 
-    /**
-     * Consolida reglas dispersas en múltiples archivos en un único Ai_Rules.md
-     * Útil para migración cuando ya tienes archivos de reglas existentes
-     */
     async consolidateRules(): Promise<vscode.Uri> {
-        const sourceFileName = 'Ai_Rules.md';
-        const sourcePath = path.join(this.workspaceRoot, sourceFileName);
+        const sourcePath = path.join(this.workspaceRoot, 'Ai_Rules.md');
 
-        // Verificar si ya existe Ai_Rules.md
-        if (await this.fileExists(sourcePath)) {
+        if (await this.engine.fileExists(sourcePath)) {
             const overwrite = await vscode.window.showWarningMessage(
                 'Ai_Rules.md ya existe. ¿Deseas sobrescribirlo con las reglas consolidadas?',
                 { modal: true },
@@ -201,133 +103,36 @@ export class RuleSyncService {
             }
         }
 
-        // Escanear archivos de reglas existentes
-        const scanResult = await this.scanner.scanWorkspace();
+        return vscode.Uri.file(await this.engine.consolidateRules({ overwrite: true }));
+    }
 
-        if (scanResult.ruleFiles.length === 0) {
-            throw new Error('No se encontraron archivos de reglas para consolidar');
-        }
+    private async confirmExistingTargets(aiTypes?: string[]): Promise<string[]> {
+        const definitions = ruleRegistry.getAllDefinitions()
+            .filter(definition => !aiTypes || aiTypes.includes(definition.id));
+        const confirmedTargets: string[] = [];
 
-        // Construir contenido consolidado
-        let consolidatedContent = this.getConsolidationHeader();
+        for (const definition of definitions) {
+            if (await this.engine.fileExists(path.join(this.workspaceRoot, definition.filePath))) {
+                const confirmed = await this.confirmOverwrite(definition.filePath);
 
-        // Agregar cada archivo encontrado
-        for (const ruleFile of scanResult.ruleFiles) {
-            const definition = ruleRegistry.getDefinition(ruleFile.aiType);
-            const fileName = path.basename(ruleFile.uri.fsPath);
-
-            try {
-                const content = await fs.readFile(ruleFile.uri.fsPath, 'utf-8');
-
-                // Limpiar encabezado automático si existe
-                const cleanContent = this.removeAutoGeneratedHeader(content);
-
-                // Agregar sección para esta IA
-                consolidatedContent += `\n## 📁 Reglas de ${definition?.name || ruleFile.aiType}\n\n`;
-                consolidatedContent += `> Consolidado desde: \`${fileName}\`\n\n`;
-                consolidatedContent += cleanContent + '\n\n';
-                consolidatedContent += '---\n';
-            } catch (error) {
-                console.error(`Error leyendo ${fileName}:`, error);
-                // Continuar con los demás archivos
+                if (!confirmed) {
+                    continue;
+                }
             }
+
+            confirmedTargets.push(definition.id);
         }
 
-        // Agregar footer
-        consolidatedContent += this.getConsolidationFooter(scanResult.ruleFiles.length);
-
-        // Escribir el archivo consolidado
-        await fs.writeFile(sourcePath, consolidatedContent, 'utf-8');
-
-        // Actualizar metadata
-        const metadata = await this.metadataService.readMetadata();
-        metadata.sourcePath = sourceFileName;
-        await this.metadataService.writeMetadata(metadata);
-
-        return vscode.Uri.file(sourcePath);
+        return confirmedTargets;
     }
 
-    /**
-     * Obtiene el encabezado para archivo consolidado
-     */
-    private getConsolidationHeader(): string {
-        const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
-
-        return `# 🤖 Reglas de IA - Consolidadas
-
-Este archivo fue generado automáticamente consolidando reglas dispersas encontradas en el proyecto.
-
-**Fecha de consolidación**: ${timestamp}
-
----
-
-## 💡 Qué hacer ahora
-
-1. **Revisa** el contenido consolidado abajo
-2. **Edita** y organiza las reglas como prefieras
-3. **Sincroniza** para propagar cambios: ejecuta "AI Rules: Sincronizar todas las reglas"
-4. **(Opcional)** Elimina los archivos originales si ya no los necesitas
-
----
-
-`;
-    }
-
-    /**
-     * Obtiene el footer para archivo consolidado
-     */
-    private getConsolidationFooter(filesCount: number): string {
-        return `\n\n---
-
-## ✨ Consolidación Completada
-
-Se consolidaron **${filesCount} archivos** de reglas en este documento.
-
-**Próximos pasos sugeridos**:
-- Organiza y limpia reglas duplicadas
-- Agrega reglas específicas para tu proyecto
-- Ejecuta "AI Rules: Sincronizar todas las reglas" para aplicar cambios
-
----
-
-*Este es ahora tu archivo fuente de verdad para todas las herramientas de IA*
-`;
-    }
-
-    /**
-     * Remueve encabezado generado automáticamente de un archivo
-     */
-    private removeAutoGeneratedHeader(content: string): string {
-        // Detectar y remover encabezado generado automáticamente
-        const headerPattern = /^#\s*⚠️\s*Archivo generado automáticamente[\s\S]*?---\s*\n\n/;
-        return content.replace(headerPattern, '').trim();
-    }
-
-    /**
-     * Agrega un encabezado automático al contenido
-     */
-    private addHeader(content: string): string {
-        const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
-
-        const header = `# ⚠️ Archivo generado automáticamente
-# Fuente: Ai_Rules.md
-# Fecha: ${timestamp}
-# No editar directamente - los cambios se sobrescribirán
-# 
-# Para actualizar estas reglas, edita Ai_Rules.md y ejecuta:
-# "AI Rules: Sincronizar todas las reglas"
-
----
-
-`;
-
-        return header + content;
-    }
-
-    /**
-     * Solicita confirmación al usuario para sobrescribir un archivo
-     */
     private async confirmOverwrite(filePath: string): Promise<boolean> {
+        const fullPath = path.join(this.workspaceRoot, filePath);
+
+        if (!await this.engine.fileExists(fullPath)) {
+            return true;
+        }
+
         const answer = await vscode.window.showWarningMessage(
             `El archivo ${filePath} ya existe. ¿Deseas sobrescribirlo?`,
             { modal: true },
@@ -337,90 +142,8 @@ Se consolidaron **${filesCount} archivos** de reglas en este documento.
 
         return answer === 'Sí';
     }
-
-    /**
-     * Asegura que existe el directorio para un archivo
-     */
-    private async ensureDirectory(filePath: string): Promise<void> {
-        const directory = path.dirname(filePath);
-        await fs.mkdir(directory, { recursive: true });
-    }
-
-    /**
-     * Verifica si un archivo existe
-     */
-    private async fileExists(filePath: string): Promise<boolean> {
-        try {
-            await fs.access(filePath);
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    /**
-     * Obtiene la plantilla para el archivo fuente
-     */
-    private getSourceTemplate(): string {
-        return `# 🤖 AI Rules - Source of Truth
-
-This file is the **single source of truth** for all AI rules in this project.
-
-Changes here are automatically synchronized to:
-- Cursor (.cursorrules)
-- GitHub Copilot (.github/copilot-instructions.md)
-- Windsurf (.windsurfrules)
-- Cline (.clinerules)
-- Aider (.aider.conf.yml)
-- Claude (CLAUDE.md)
-- Generic agents (agents.md)
-
-## 📋 General Rules
-
-### Code Style
-- Use TypeScript for all new code
-- Follow camelCase naming conventions
-- Document public functions with JSDoc
-- Keep functions small and focused
-
-### Architecture
-- Separation of concerns
-- Reusable components
-- Dependency injection where appropriate
-
-### Testing
-- Write unit tests for business logic
-- Maintain coverage > 80%
-
-### Documentation
-- Keep README updated
-- Comments in English
-- Document important decisions
-
-## 🎯 Tech Stack
-
-- **Runtime**: Node.js
-- **Language**: TypeScript
-- **IDE**: Visual Studio Code
-- **Version control**: Git
-
-## 💡 AI Preferences
-
-- Explain the reasoning behind suggestions
-- Prioritize clean and maintainable code over premature optimization
-- Suggest best practices and design patterns when relevant
-- Detect and warn about potential bugs or security issues
-
----
-
-✨ **Tip**: Sync these changes by running "AI Rules: Sync All Rules" from the command palette.
-`;
-    }
 }
 
-/**
- * Crea una instancia del servicio de sincronización
- */
 export function createRuleSyncService(
     metadataService: MetadataService,
     scanner: RuleScanner

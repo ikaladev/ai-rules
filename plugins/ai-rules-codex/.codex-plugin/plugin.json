@@ -1,0 +1,37 @@
+{
+  "name": "ai-rules-codex",
+  "version": "0.1.0",
+  "description": "Maintain shared AI assistant rules from Codex.",
+  "author": {
+    "name": "ikaladev",
+    "url": "https://github.com/ikaladev"
+  },
+  "homepage": "https://github.com/ikaladev/ai-rules",
+  "repository": "https://github.com/ikaladev/ai-rules",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "rules",
+    "codex",
+    "agents",
+    "sync"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Rules Codex",
+    "shortDescription": "Maintain shared AI assistant rules from Codex.",
+    "longDescription": "AI Rules Codex helps Codex inspect, consolidate, initialize, and synchronize project AI rules using Ai_Rules.md as the source of truth.",
+    "developerName": "ikaladev",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Audit this project's AI rule files.",
+      "Create Ai_Rules.md and sync my assistants.",
+      "Consolidate scattered AI rules."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

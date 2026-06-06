@@ -8,7 +8,7 @@
         "outDir": "out",
         "sourceMap": true,
         "strict": true,
-        "rootDir": "src",
+        "rootDir": ".",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "skipLibCheck": true,
@@ -16,7 +16,9 @@
         "resolveJsonModule": true
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "packages/**/*",
+        "scripts/**/*"
     ],
     "exclude": [
         "node_modules",

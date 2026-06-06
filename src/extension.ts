@@ -42,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
         const syncService = createRuleSyncService(metadataService, scanner);
 
         // Crear TreeView
-        const { provider: treeProvider, view: treeView } = createRuleTreeView(context);
+        const { provider: treeProvider } = createRuleTreeView(context);
 
         // Registrar comandos
         registerCommands(context, scanner, syncService, treeProvider);

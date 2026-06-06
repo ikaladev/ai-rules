@@ -54,11 +54,14 @@ class RuleTreeItem extends vscode.TreeItem {
             case TreeItemType.Source:
                 return 'Archivo fuente de reglas (Ai_Rules.md)';
 
-            case TreeItemType.AIRule:
-                if (!this.aiType) return '';
+            case TreeItemType.AIRule: {
+                if (!this.aiType) {
+                    return '';
+                }
                 const definition = ruleRegistry.getDefinition(this.aiType);
                 const statusText = this.getStatusText();
                 return `${definition?.description || ''}\n\nEstado: ${statusText}`;
+            }
 
             case TreeItemType.NoSource:
                 return 'El archivo fuente Ai_Rules.md no existe. Créalo para comenzar.';
